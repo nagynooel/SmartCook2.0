@@ -12,7 +12,7 @@ This is an updated and rethought version of my older SmartCook project with some
 🔴 - Planned
 🟡 - In Progress
 
-* 🟡 Account creation
+* User authentication system
 * 🟡 Profile customization
 * 🔴 Custom recipe creation  
 * 🔴 Macronutrient tracking
@@ -47,3 +47,9 @@ DB_NAME=smartcook2
 DB_USERNAME=root
 DB_PASSWORD=
 ```
+
+## Credits/Sources
+
+This project uses some images or vectors that have not been created by myself. Here are all of the images/vectors used with there creators and links.
+
+* [No profile picture vector by OpenClipart](https://freesvg.org/users-profile-icon)

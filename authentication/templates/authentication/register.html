@@ -1,0 +1,15 @@
+{% extends "cookbook/layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} Register {% endblock%}
+
+{% block body %}
+    
+    {% crispy form %}
+    
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'authentication/js/client_side_form_validation.js' %}"></script>
+{% endblock scripts %}

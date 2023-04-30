@@ -1,0 +1,113 @@
+@charset "UTF-8";
+/*  Main Style File
+ *  @package smartcook
+ *  @author Noel Nagy
+ *  @website: https://github.com/nagynooel
+ *  ©2023 Noel Nagy - All rights reserved. */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+:root {
+  --bg: hsl(0,0%,7%);
+  --surface: hsl(0,0%,12%);
+  --primary: hsl(268, 100%, 78%);
+  --secondary: hsl(174, 97%, 43%);
+  --error: hsl(349, 52%, 61%);
+  --on-bg: white;
+  --on-surface: white;
+  --on-primary: white;
+  --on-secondary: white;
+  --on-error: black;
+}
+
+/* - Global styles */
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  background-color: var(--bg);
+}
+
+h1, h2, h3, h4, h5, h6, p {
+  color: var(--text-light);
+}
+
+a {
+  color: var(--text-secondary);
+}
+
+/* Forms */
+.form-floating label {
+  left: auto !important;
+}
+
+form .asteriskField {
+  color: red;
+}
+
+/* Top Navigation */
+#top-nav {
+  border-bottom: 2px solid var(--bs-primary);
+}
+
+/* Fix navbar hiding main content */
+main {
+  margin-top: 64px;
+}
+
+/* Top Alert Container */
+#top-alert-cont {
+  z-index: 1031;
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+/* - Authentication pages */
+.full_page_form {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 1rem 1rem 2rem 1rem;
+  background-color: var(--surface);
+  color: var(--on-error);
+}
+.full_page_form legend {
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  padding: 1rem 0;
+}
+
+#login-form {
+  width: 30%;
+}
+
+@media screen and (max-width: 1200px) {
+  #registration-form {
+    width: 60%;
+  }
+  #login-form {
+    width: 50%;
+  }
+}
+@media screen and (max-width: 768px) {
+  #registration-form {
+    width: 85%;
+  }
+  #login-form {
+    width: 60%;
+  }
+}
+@media screen and (max-width: 576px) {
+  #registration-form {
+    width: 95%;
+  }
+  #login-form {
+    width: 85%;
+  }
+}/*# sourceMappingURL=styles.css.map */
