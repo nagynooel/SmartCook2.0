@@ -81,23 +81,33 @@ def account_view(request):
     # - POST request
     if request.method == "POST":
         # Profile picture form
-            if request.POST.get("reset_pfp", None) == "reset":
-                # Reset profile picture
-                request.user.profile.picture = os.path.join("profile", "default.svg")
-                request.user.profile.save()
-            elif request.FILES.get("picture", None):
-                # Update profile picture
-                profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
-                
-                if profile_form.is_valid():
-                    profile_form.save()
-                else:
-                    for errors in profile_form.errors["picture"].as_data():
-                        for error in errors:
-                            messages.error(request, error)
+        if request.POST.get("reset_pfp", None) == "reset":
+            # Reset profile picture
+            request.user.profile.picture = os.path.join("profile", "default.svg")
+            request.user.profile.save()
+        elif request.FILES.get("picture", None):
+            # Update profile picture
+            profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile, request=request)
+            
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile picture successfully changed!")
+            else:
+                for errors in profile_form.errors["picture"].as_data():
+                    for error in errors:
+                        messages.error(request, error)
+        
+        # General information form
+        account_form = UpdateAccountForm(request.POST, instance=request.user, request=request)
+        
+        if account_form.is_valid():
+            account_form.save()
+            messages.success(request, "Account information successfully changed!")
         
     # - GET request
-    account_form = UpdateAccountForm(instance=request.user)
+    else:
+        account_form = UpdateAccountForm(instance=request.user)
+    
     profile_form = UpdateProfileForm(instance=request.user.profile)
     
     context = {

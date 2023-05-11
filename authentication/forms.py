@@ -220,6 +220,7 @@ class UpdateAccountForm(forms.ModelForm):
         fields = ["first_name", "last_name", "username", "email"]
     
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
         # Initialize crispy forms form helper and set basic styling
@@ -228,12 +229,21 @@ class UpdateAccountForm(forms.ModelForm):
         self.helper.label_class = "form-label"
         self.helper.disable_csrf = True
         
+        # Make all fields required
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+        self.fields["username"].required = True
+        self.fields["email"].required = True
+        
         # Remove default helper text
         self.fields["username"].help_text = ""
+        
+        # Disable username field
+        self.fields["username"].disabled = True
 
         self.helper.layout = Layout(
             Fieldset(
-                "Change account information",
+                "General information",
                 Div(
                     Div(
                         FloatingField("first_name"),
@@ -247,8 +257,9 @@ class UpdateAccountForm(forms.ModelForm):
                 ),
                 Div(
                     Div(
-                        FloatingField("username"),
-                        css_class="col-md-6"
+                        FloatingField("username", template="crispy_forms/no_margin_floating_input.html"),
+                        data_bs_toggle="tooltip", data_bs_placement="bottom", data_bs_title="Username can not be changed.",
+                        css_class="col-md-6 mb-3"
                     ),
                     Div(
                         FloatingField("email"),
@@ -258,3 +269,19 @@ class UpdateAccountForm(forms.ModelForm):
                 ),
             )
         )
+    
+    # Validate email
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        
+        # Return email if it stays the same
+        if email == self.request.user.email:
+            return email
+
+        # Email not already registered
+        new = User.objects.filter(email=email)
+
+        if new.count():
+            raise ValidationError("Email address is already in database!")
+
+        return email
