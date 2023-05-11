@@ -31,8 +31,18 @@ h1, h2, h3, h4, h5, h6, p {
   color: var(--text-light);
 }
 
+h1 {
+  margin: 1rem 0;
+}
+
 a {
   color: var(--text-secondary);
+}
+
+#bottom-right-cont {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
 }
 
 /* Forms */
@@ -49,9 +59,17 @@ form .asteriskField {
   border-bottom: 2px solid var(--bs-primary);
 }
 
+#top-nav #top-profile-picture {
+  width: 24px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 /* Fix navbar hiding main content */
 main {
-  margin-top: 64px;
+  margin-top: calc(64px + 1rem);
 }
 
 /* Top Alert Container */
@@ -61,6 +79,55 @@ main {
   top: 1rem;
   left: 50%;
   transform: translate(-50%, 0);
+}
+
+/* Image upload */
+.image-upload-cont {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.image-upload-cont label {
+  width: 80%;
+  height: -moz-fit-content;
+  height: fit-content;
+  position: relative;
+}
+.image-upload-cont label img {
+  width: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  -o-object-position: center;
+     object-position: center;
+  aspect-ratio: 1/1;
+}
+.image-upload-cont label::after {
+  opacity: 0%;
+  transition: opacity 300ms;
+  content: "Upload image";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 99;
+  font-size: 2rem;
+  font-weight: bold;
+  background-color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-upload-cont label:hover::after {
+  opacity: 80%;
+  cursor: pointer;
+}
+.image-upload-cont #remove-profile-picture-btn {
+  width: 80%;
+}
+.image-upload-cont input[type=file] {
+  display: none;
 }
 
 /* - Authentication pages */

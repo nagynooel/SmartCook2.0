@@ -1,0 +1,42 @@
+{% extends "cookbook/layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} My Account {% endblock%}
+
+{% block body %}
+    
+    <div class="container" id="account-cont">
+        <h1 class="text-center">Account Inforamtion</h1>
+        <form action="{% url 'account' %}" method="POST" class="needs-validation bg-surface p-3" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-6 image-upload-cont" id="profile-upload-cont">
+                    {% crispy profile_form %}
+                </div>
+                
+                <div class="col-lg-6 mt-3">
+                    {% crispy account_form %}
+                    <a href="" class="btn btn-secondary w-100 mb-3">Send Password Reset Email</a>
+                    <a href="" class="btn btn-danger w-100">Deactivate Account</a>
+                        
+                    <p class="mt-3">Date joined: {{ joined }}</p>
+                </div>
+                
+            </div>
+            
+            <div id="bottom-right-cont">
+                <input type="submit" value="Save Changes" class="btn btn-primary">
+                <a href="" class="btn btn-secondary">Discard Changes</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    
+    <script src="{% static 'authentication/js/client_side_form_validation.js' %}"></script>
+    <script src="{% static 'cookbook/js/image_upload.js' %}"></script>
+    
+{% endblock %}

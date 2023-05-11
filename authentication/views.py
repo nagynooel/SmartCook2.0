@@ -11,10 +11,13 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, UpdateProfileForm, UpdateAccountForm
 from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.encoding import iri_to_uri
+
+from .models import Profile
+import os
 
 
 # Register new user page
@@ -70,3 +73,37 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect(reverse("index"))
+
+
+# Change Account settings
+@login_required
+def account_view(request):
+    # - POST request
+    if request.method == "POST":
+        # Profile picture form
+            if request.POST.get("reset_pfp", None) == "reset":
+                # Reset profile picture
+                request.user.profile.picture = os.path.join("profile", "default.svg")
+                request.user.profile.save()
+            elif request.FILES.get("picture", None):
+                # Update profile picture
+                profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+                
+                if profile_form.is_valid():
+                    profile_form.save()
+                else:
+                    for errors in profile_form.errors["picture"].as_data():
+                        for error in errors:
+                            messages.error(request, error)
+        
+    # - GET request
+    account_form = UpdateAccountForm(instance=request.user)
+    profile_form = UpdateProfileForm(instance=request.user.profile)
+    
+    context = {
+        "profile_form": profile_form,
+        "account_form": account_form,
+        "joined": request.user.date_joined,
+    }
+    
+    return render(request, "authentication/account.html", context)

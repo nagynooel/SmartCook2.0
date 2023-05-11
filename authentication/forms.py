@@ -8,13 +8,16 @@
 
 from django.urls import reverse
 from django import forms
+from django.forms import ModelForm, ImageField, FileInput, HiddenInput
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Field, Div, Hidden
+from crispy_forms.layout import Submit, Layout, Fieldset, Field, Div, Hidden, HTML
 from crispy_bootstrap5.bootstrap5 import FloatingField
+
+from django.contrib.auth.models import User
+from .models import Profile
 
 import re
 
@@ -174,5 +177,84 @@ class LoginForm(AuthenticationForm):
                 FloatingField("username"),
                 FloatingField("password"),
                 Submit("submit", "Login")
+            )
+        )
+
+
+# Form for updating account information
+class UpdateProfileForm(forms.ModelForm):
+    
+    picture = forms.ImageField(widget=FileInput)
+    reset_pfp = forms.CharField(widget=HiddenInput, required=False)
+    
+    class Meta:
+        model = Profile
+        fields = ["picture"]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Initialize crispy forms form helper and set basic styling
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_show_labels = False
+        self.helper.disable_csrf = True
+        
+        self.helper.layout = Layout(
+            Field("reset_pfp", css_class="reset-field"),
+            HTML("""
+                <label for="profile-picture">
+                    <img class="image-preview" src="{{ request.user.profile.picture.url }}" alt="{{ user.get_username }}'s profile picture">
+                </label>
+            """),
+            Field("picture", css_class="image-input", id="profile-picture"),
+            HTML("""<a class="btn btn-danger remove-image-file-btn" id="remove-profile-picture-btn">Remove Picture</a>""")
+        )
+
+
+# Form for changing account information
+class UpdateAccountForm(forms.ModelForm):
+    
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "username", "email"]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Initialize crispy forms form helper and set basic styling
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = "form-label"
+        self.helper.disable_csrf = True
+        
+        # Remove default helper text
+        self.fields["username"].help_text = ""
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "Change account information",
+                Div(
+                    Div(
+                        FloatingField("first_name"),
+                        css_class="col-md-6"
+                    ),
+                    Div(
+                        FloatingField("last_name"),
+                        css_class="col-md-6"
+                    ),
+                    css_class="row"
+                ),
+                Div(
+                    Div(
+                        FloatingField("username"),
+                        css_class="col-md-6"
+                    ),
+                    Div(
+                        FloatingField("email"),
+                        css_class="col-md-6"
+                    ),
+                    css_class="row"
+                ),
             )
         )
