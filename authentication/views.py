@@ -106,7 +106,7 @@ def account_view(request):
         
     # - GET request
     else:
-        account_form = UpdateAccountForm(instance=request.user)
+        account_form = UpdateAccountForm(instance=request.user, request=request)
     
     profile_form = UpdateProfileForm(instance=request.user.profile)
     
