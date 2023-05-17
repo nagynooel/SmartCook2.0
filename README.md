@@ -35,17 +35,28 @@ This is an updated and rethought version of my older SmartCook project with some
 In order to run the application you **have to** set up some environ variables. You can do this however you'd like.
 I recommend using a ".env" file. You can just simply create it in the root folder of the project and it will automatically use it. Here are all of the variables you need with some examples.
 
+I used the gmail SMTP server in the below example.
+
+Strings inside "<>" are sensitive and unique data and you need to fill them in.
+
 ```
 # Virtual environmental variables
 # Django Variables
-SECRET_KEY=
+SECRET_KEY=<application secret key>
 
 # Database Variables
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_NAME=smartcook2
 DB_USERNAME=root
-DB_PASSWORD=
+DB_PASSWORD=<database password>
+
+# Email variables
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=465
+EMAIL_USER=<email username>
+EMAIL_PASSWORD=<email password>
+EMAIL_FROM=noreply@smartcook.com
 ```
 
 ## Credits/Sources

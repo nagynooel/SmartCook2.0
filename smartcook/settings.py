@@ -145,3 +145,10 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # User uploads
 MEDIA_ROOT = path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# Email
+EMAIL_HOST = environ.get("EMAIL_HOST")
+EMAIL_PORT = environ.get("EMAIL_PORT")
+EMAIL_HOST_USER = environ.get("EMAIL_USER")
+EMAIL_HOST_PASSWORD = environ.get("EMAIL_PASSWORD")
+EMAIL_FROM = environ.get("EMAIL_FROM")
