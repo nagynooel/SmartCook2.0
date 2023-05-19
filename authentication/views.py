@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from .forms import RegistrationForm, LoginForm, UpdateProfileForm, UpdateAccountForm, ResetPasswordForm
+from .forms import RegistrationForm, LoginForm, UpdateProfileForm, UpdateAccountForm, ResetPasswordForm, ForgottenPasswordForm
 from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.encoding import iri_to_uri
@@ -135,6 +135,31 @@ def send_password_reset_email_view(request):
         messages.success(request, "Password reset email sent successfully")
 
     return redirect(reverse("account"))
+
+
+def send_forgotten_password_email_view(request):
+    if request.method == "POST":
+        
+        form = ForgottenPasswordForm(request.POST)
+
+        if form.is_valid():
+            try:
+                utils.send_password_reset_email(request, form.cleaned_data["email"])
+            except smtplib.SMTPResponseException as Err:
+                messages.error(request, Err.smtp_error)
+            except Exception as Err:
+                messages.error(request, Err)
+            else:
+                messages.success(request, "Password reset email sent successfully")
+        
+    else:
+        form = ForgottenPasswordForm()
+    
+    context = {
+        "form": form
+    }
+
+    return render(request, "authentication/forgotten_password.html", context)
 
 
 # Check for a valid token and allow user to reset their password

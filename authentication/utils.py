@@ -100,6 +100,6 @@ def send_password_reset_email(request, recipient):
     text = render_to_string("authentication/email/password_reset.txt", context)
 
     # Send the reset email
-    send_smtp_email(request.user.email, "Reset Your Password", html, text)
+    send_smtp_email(user.email, "Reset Your Password", html, text)
 
     return True

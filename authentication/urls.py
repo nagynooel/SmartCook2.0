@@ -19,5 +19,6 @@ urlpatterns = [
     path('auth/logout/', views.logout_view, name="logout"),
     path('account/', views.account_view, name="account"),
     path('account/reset-password/email', views.send_password_reset_email_view, name="send_password_reset_email"),
-    path('account/reset-password/<str:token>', views.reset_password_view, name="reset_password")
+    path('account/reset-password/<str:token>', views.reset_password_view, name="reset_password"),
+    path('account/forgotten-password', views.send_forgotten_password_email_view, name="forgotten_password")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

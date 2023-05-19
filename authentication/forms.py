@@ -179,6 +179,10 @@ class LoginForm(AuthenticationForm):
                 "Login",
                 FloatingField("username"),
                 FloatingField("password"),
+                Div(
+                    HTML("<a href='{% url 'forgotten_password' %}'>Forgot password?</a>"),
+                    css_class="mb-3"
+                ),
                 Submit("submit", "Login")
             )
         )
@@ -321,7 +325,7 @@ class ResetPasswordForm(forms.Form):
             )
         )
     
-    def clean_confirm_password(self):
+    def clean_password2(self):
         # Get user input
         password1 = self.cleaned_data["password1"]
         password2 = self.cleaned_data["password2"]
@@ -352,3 +356,44 @@ class ResetPasswordForm(forms.Form):
 
         # Send an email to notify the user of a password change
         utils.send_smtp_email(user.email, "Account password changed", render_to_string("authentication/email/password_changed.html",context), render_to_string("authentication/email/password_changed.txt",context))
+
+
+class ForgottenPasswordForm(forms.Form):
+    
+    email = forms.EmailField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Initialize crispy forms form helper and set basic styling
+        self.helper = FormHelper()
+        self.helper.form_id = "forgotten-password-form"
+        self.helper.form_class = "full_page_form container shadow-lg"
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse("forgotten_password")
+        self.helper.label_class = "form-label"
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "Forgotten Password",
+                FloatingField("email"),
+                Div(
+                    HTML("<a href='{% url 'login' %}'>Login</a>"),
+                    css_class="mb-3"
+                ),
+                Submit("submit", "Send Password Reset")
+            )
+        )
+    
+    def clean_email(self):
+        # Validate user exist
+        self.clean()
+
+        email = self.cleaned_data["email"].lower()
+
+        try:
+            User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError("User does not exist")
+
+        return email
