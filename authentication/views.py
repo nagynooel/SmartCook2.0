@@ -11,14 +11,15 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from .forms import RegistrationForm, LoginForm, UpdateProfileForm, UpdateAccountForm
+from .forms import RegistrationForm, LoginForm, UpdateProfileForm, UpdateAccountForm, ResetPasswordForm
 from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.encoding import iri_to_uri
 
-import os, smtplib
+import os, smtplib, datetime
 
 from . import utils
+from .models import PasswordResetToken
 
 
 # Register new user page
@@ -137,6 +138,37 @@ def send_password_reset_email_view(request):
 
 
 # Check for a valid token and allow user to reset their password
-@login_required
 def reset_password_view(request, token):
-    pass
+
+    # Validate token exist
+    try:
+        token_obj = PasswordResetToken.objects.get(token=token)
+    except PasswordResetToken.DoesNotExist:
+        messages.error(request, "Token not found")
+        return redirect(reverse("index"))
+
+    # Validate token is not used or expired
+    if token_obj.used:
+        messages.error(request, "You already used this link")
+        return redirect(reverse("index"))
+
+    if token_obj.expiry < datetime.datetime.now(datetime.timezone.utc):
+        messages.error(request, "This link is already expired")
+        return redirect(reverse("index"))
+
+    if request.method == "POST":
+        form = ResetPasswordForm(request.POST or None, token=token)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Password changed successfully")
+            return redirect(reverse("index"))
+
+    else:
+        form = ResetPasswordForm(token=token)
+
+    context = {
+        "form":form
+    }
+
+    return render(request, "authentication/reset_password.html", context)

@@ -17,17 +17,20 @@ from crispy_forms.layout import Submit, Layout, Fieldset, Field, Div, Hidden, HT
 from crispy_bootstrap5.bootstrap5 import FloatingField
 
 from django.contrib.auth.models import User
-from .models import Profile
+from .models import Profile, PasswordResetToken
 
+from django.template.loader import render_to_string
 import re
+from . import utils
 
+global_password_regex = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[   ?!@$%^&*-]).{8,}$"
 
 # Form for registering a new user
 class RegistrationForm(UserCreationForm):
 
     # Regex to use on front- and backend
     username_regex = "[a-z,A-Z,0-9]{6,150}"
-    password_regex = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[   ?!@$%^&*-]).{8,}$"
+    password_regex = global_password_regex
 
 
     class Meta(UserCreationForm.Meta):
@@ -221,7 +224,7 @@ class UpdateAccountForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
-        super().__init__(*args, **kwargs)
+        super(UpdateAccountForm, self).__init__(*args, **kwargs)
 
         # Initialize crispy forms form helper and set basic styling
         self.helper = FormHelper()
@@ -285,3 +288,67 @@ class UpdateAccountForm(forms.ModelForm):
             raise ValidationError("Email address is already in database!")
 
         return email
+
+
+class ResetPasswordForm(forms.Form):
+    
+    password_regex = global_password_regex
+
+    password1 = forms.CharField(widget=forms.PasswordInput, label="New Password")
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm New Password")
+
+    def __init__(self, *args, **kwargs):
+        self.token = kwargs.pop('token')
+        super().__init__(*args, **kwargs)
+
+        # Initialize crispy forms form helper and set basic styling
+        self.helper = FormHelper()
+        self.helper.form_id = "reset-password-form"
+        self.helper.form_class = "full_page_form container shadow-lg"
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse("reset_password", kwargs={"token":self.token})
+        self.helper.label_class = "form-label"
+
+        self.fields["password1"].required = True
+        self.fields["password2"].required = True
+
+        self.helper.layout = Layout(
+            Fieldset(
+                "Change Password",
+                FloatingField("password1", pattern=self.password_regex),
+                FloatingField("password2", pattern=self.password_regex),
+                Submit("submit", "Save password")
+            )
+        )
+    
+    def clean_confirm_password(self):
+        # Get user input
+        password1 = self.cleaned_data["password1"]
+        password2 = self.cleaned_data["password2"]
+        
+        # Validate password matches requirements
+        if not re.match(self.password_regex, password1):
+            raise ValidationError("Password does not match the requirements!")
+
+        # Validate passwords match
+        if password1 != password2:
+            raise ValidationError("Passwords do not match")
+    
+    def save(self):
+        self.clean()
+        token_obj = PasswordResetToken.objects.filter(token=self.token)
+        user = token_obj.first().user
+
+        # Set user password
+        user.set_password(self.cleaned_data["password1"])
+        user.save()
+
+        # Set token to used
+        token_obj.update(used=True)
+
+        context = {
+            "first_name": user.first_name
+        }
+
+        # Send an email to notify the user of a password change
+        utils.send_smtp_email(user.email, "Account password changed", render_to_string("authentication/email/password_changed.html",context), render_to_string("authentication/email/password_changed.txt",context))
