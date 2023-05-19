@@ -16,3 +16,10 @@ class Profile(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=36)
+    expiry = models.DateTimeField()
+    used = models.BooleanField(default=False)

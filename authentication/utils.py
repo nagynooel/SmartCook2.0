@@ -11,6 +11,14 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from smartcook.settings import EMAIL_HOST, EMAIL_PORT,EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_FROM, BASE_DIR
 
+from django.urls import reverse
+from django.template.loader import render_to_string
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from .models import PasswordResetToken
+from uuid import uuid4
+import datetime
+
 # Send a basic SMTP email using the parameters from the main settings file
 # Items of the embeds list should be strings that contain the path from the smartcook directory
 # E.g.: "authentication/static/authentication/img/email/Logo.png"
@@ -52,3 +60,46 @@ def send_smtp_email(recipient, subject, html_message, text_message, embeds=[]):
 
         # send email
         server.send_message(msg, from_email, to_email)
+    
+    return True
+
+
+# Send a password reset name to the given recipients email address
+def send_password_reset_email(request, recipient):
+    # Get user object
+    try:
+        user = User.objects.get(email=recipient)
+    except User.DoesNotExist:
+        raise ValueError("User does not exist")
+
+    # Generate a token until it is unique
+    token = uuid4()
+    exists = True
+    while exists:
+        try:
+            PasswordResetToken.objects.get(token = token)
+            token = uuid4()
+        except PasswordResetToken.DoesNotExist:
+            exists = False
+
+    # Set a expiry date of 30 minutes
+    expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
+
+    # Save the token
+    PasswordResetToken.objects.create(user=user, token=token, expiry=expiry)
+
+    # Create context
+    context = {
+        "first_name": user.first_name,
+        "reset_link": "http://" + get_current_site(request).domain + reverse("reset_password", kwargs={'token':token}),
+        "expiry_date": expiry
+    }
+
+    # Render the email content
+    html = render_to_string("authentication/email/password_reset.html", context)
+    text = render_to_string("authentication/email/password_reset.txt", context)
+
+    # Send the reset email
+    send_smtp_email(request.user.email, "Reset Your Password", html, text)
+
+    return True
