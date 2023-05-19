@@ -16,8 +16,9 @@ from django.utils.html import strip_tags
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.encoding import iri_to_uri
 
-from .models import Profile
-import os
+import os, smtplib
+
+from . import utils
 
 
 # Register new user page
@@ -117,3 +118,25 @@ def account_view(request):
     }
     
     return render(request, "authentication/account.html", context)
+
+
+# Send a password reset email with a unique token
+@login_required
+def send_password_reset_email_view(request):
+    # Send the email
+    try:
+        utils.send_password_reset_email(request, request.user.email)
+    except smtplib.SMTPResponseException as Err:
+        messages.error(request, Err.smtp_error)
+    except Exception as Err:
+        messages.error(request, Err)
+    else:
+        messages.success(request, "Password reset email sent successfully")
+
+    return redirect(reverse("account"))
+
+
+# Check for a valid token and allow user to reset their password
+@login_required
+def reset_password_view(request, token):
+    pass

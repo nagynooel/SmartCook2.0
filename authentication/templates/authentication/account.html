@@ -17,9 +17,8 @@
                 
                 <div class="col-lg-6 mt-3">
                     {% crispy account_form %}
-                    <a href="" class="btn btn-secondary w-100 mb-3">Send Password Reset Email</a>
+                    <a href="{% url 'send_password_reset_email' %}" class="btn btn-secondary w-100 mb-3">Send Password Reset Email</a>
                     <a href="" class="btn btn-danger w-100">Deactivate Account</a>
-                        
                     <p class="mt-3">Date joined: {{ joined }}</p>
                 </div>
                 
