@@ -19,7 +19,7 @@ from django.utils.encoding import iri_to_uri
 import os, smtplib, datetime
 
 from . import utils
-from .models import PasswordResetToken
+from .models import PasswordResetToken, DeactivateToken
 
 
 # Register new user page
@@ -197,3 +197,46 @@ def reset_password_view(request, token):
     }
 
     return render(request, "authentication/reset_password.html", context)
+
+
+# Send an email that contains a link to deactivate the account
+def send_deactivate_email_view(request):
+    try:
+        utils.send_deactivate_account_email(request, request.user.email)
+    except smtplib.SMTPResponseException as Err:
+        messages.error(request, Err.smtp_error)
+    except Exception as Err:
+        messages.error(request, Err)
+    else:
+        messages.success(request, "Account deactivation email sent successfully")
+
+    return redirect(reverse("account"))
+
+
+# Deactivate the acocunt with the given token
+def deactivate_account_view(request, token):
+    # Validate token exist
+    try:
+        token_obj = DeactivateToken.objects.get(token=token)
+    except DeactivateToken.DoesNotExist:
+        messages.error(request, "Token not found")
+        return redirect(reverse("index"))
+
+    # Validate token is not used or expired
+    if token_obj.used:
+        messages.error(request, "You already used this link")
+        return redirect(reverse("index"))
+
+    if token_obj.expiry < datetime.datetime.now(datetime.timezone.utc):
+        messages.error(request, "This link is already expired")
+        return redirect(reverse("index"))
+    
+    # Deactivate the account
+    user = token_obj.user
+    user.is_active = False
+    user.save()
+
+    logout(request)
+
+    messages.success(request, "User deactivated successfully")
+    return redirect(reverse("login"))

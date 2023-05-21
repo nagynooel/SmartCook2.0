@@ -1,0 +1,14 @@
+Account Deactivation
+
+Hi {{ first_name }}, we received a request to deactivate your account!
+
+If you requested it click below to finalize it:
+{{ deactivate_link }}
+
+This link is only valid until: {{ expiry_date }} UTC
+Convert UTC time: https://www.google.com/search?q=utc+time+converter
+
+If you did not request the account deactivation you can safely ignore this email.
+Only a person with access to your email can deactivate your account.
+
+©SmartCook 2023

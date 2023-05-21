@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
-from .models import PasswordResetToken
+from .models import PasswordResetToken, DeactivateToken
 from uuid import uuid4
 import datetime
 
@@ -98,6 +98,47 @@ def send_password_reset_email(request, recipient):
     # Render the email content
     html = render_to_string("authentication/email/password_reset.html", context)
     text = render_to_string("authentication/email/password_reset.txt", context)
+
+    # Send the reset email
+    send_smtp_email(user.email, "Reset Your Password", html, text)
+
+    return True
+
+
+# Send an email that contains a link to deactivate the account
+def send_deactivate_account_email(request, recipient):
+    # Get user object
+    try:
+        user = User.objects.get(email=recipient)
+    except User.DoesNotExist:
+        raise ValueError("User does not exist")
+    
+    # Generate a token until it is unique
+    token = uuid4()
+    exists = True
+    while exists:
+        try:
+            DeactivateToken.objects.get(token = token)
+            token = uuid4()
+        except DeactivateToken.DoesNotExist:
+            exists = False
+    
+    # Set a expiry date of 30 minutes
+    expiry = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
+
+    # Save the token
+    DeactivateToken.objects.create(user=user, token=token, expiry=expiry)
+
+    # Create context
+    context = {
+        "first_name": user.first_name,
+        "deactivate_link": "http://" + get_current_site(request).domain + reverse("deactivate_account", kwargs={'token':token}),
+        "expiry_date": expiry
+    }
+
+    # Render the email content
+    html = render_to_string("authentication/email/deactivate_account.html", context)
+    text = render_to_string("authentication/email/deactivate_account.txt", context)
 
     # Send the reset email
     send_smtp_email(user.email, "Reset Your Password", html, text)

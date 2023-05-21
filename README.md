@@ -13,8 +13,8 @@ This is an updated and rethought version of my older SmartCook project with some
 🟡 - In Progress
 
 * User authentication system
-* 🟡 Profile customization
-* 🔴 Custom recipe creation  
+* Profile customization
+* 🟡 Custom recipe creation  
 * 🔴 Macronutrient tracking
 * 🔴 Food planning on daily basis
 * 🔴 Importing recipes from (almost) any website

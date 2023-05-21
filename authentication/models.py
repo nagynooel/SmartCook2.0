@@ -23,3 +23,10 @@ class PasswordResetToken(models.Model):
     token = models.CharField(max_length=36)
     expiry = models.DateTimeField()
     used = models.BooleanField(default=False)
+
+
+class DeactivateToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=36)
+    expiry = models.DateTimeField()
+    used = models.BooleanField(default=False)
