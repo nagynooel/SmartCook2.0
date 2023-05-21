@@ -89,7 +89,7 @@ def account_view(request):
             request.user.profile.save()
         elif request.FILES.get("picture", None):
             # Update profile picture
-            profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile, request=request)
+            profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
             
             if profile_form.is_valid():
                 profile_form.save()
