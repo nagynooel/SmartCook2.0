@@ -10,4 +10,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index_view, name="index"),
+    path('recipes/new/', views.create_new_recipe_view, name="new_recipe")
 ]
