@@ -9,7 +9,14 @@ import smtplib, os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
-from smartcook.settings import EMAIL_HOST, EMAIL_PORT,EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_FROM, BASE_DIR
+from smartcook.settings import (
+    EMAIL_HOST,
+    EMAIL_PORT,
+    EMAIL_HOST_USER,
+    EMAIL_HOST_PASSWORD,
+    EMAIL_FROM,
+    BASE_DIR
+)
 
 from django.urls import reverse
 from django.template.loader import render_to_string

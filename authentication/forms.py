@@ -8,7 +8,7 @@
 
 from django.urls import reverse
 from django import forms
-from django.forms import ModelForm, ImageField, FileInput, HiddenInput
+from django.forms import FileInput, HiddenInput
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 

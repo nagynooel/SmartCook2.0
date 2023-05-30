@@ -1,14 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from django.templatetags.static import static
-
 from cookbook.storage import OverwriteStorage
+
 
 def rename_file(instance, filename):
     ext = filename.split(".")[-1]
     filename = f"{instance.user.id}.{ext}"
     return f"profile/{filename}"
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
