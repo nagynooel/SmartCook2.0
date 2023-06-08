@@ -186,4 +186,31 @@ main {
   #login-form {
     width: 85%;
   }
+}
+/* - Recipe pages */
+.chart-blue {
+  color: rgb(54, 162, 235);
+}
+
+.chart-pink {
+  color: rgb(255, 99, 132);
+}
+
+.chart-yellow {
+  color: rgb(255, 205, 86);
+}
+
+.nutrient-table {
+  width: 100%;
+  max-width: 400px;
+}
+.nutrient-table tr {
+  border-bottom: 1px solid white;
+}
+.nutrient-table tr td {
+  padding: 0.5rem 1rem;
+}
+.nutrient-table tr td:nth-child(2) {
+  font-weight: bold;
+  text-align: right;
 }/*# sourceMappingURL=styles.css.map */

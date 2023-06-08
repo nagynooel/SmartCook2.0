@@ -1,9 +1,102 @@
 {% extends "cookbook/layout.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %} Create new recipe {% endblock %}
 
 {% block body %}
     {% include 'cookbook/includes/add_recipe_button.html' %}
+    
+    <div class="modal modal-xl fade" id="new-ingredient-modal" tabindex="-1" aria-labelledby="new-ingredient-modal-lbl" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="new-ingredient-modal-lbl">Add Ingredient</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% crispy ingredientForm %}
+                <h2 class="text-center">Macronutrients</h2>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div><canvas id="macronutrients-chart"></canvas></div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <table class="nutrient-table">
+                            <tr>
+                                <td>Calories</td>
+                                <td>240 kcal</td>
+                            </tr>
+                            <tr>
+                                <td class="chart-blue fw-bold">Protein</td>
+                                <td>15 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td class="chart-yellow fw-bold">Carbohydrates</td>
+                                <td>15 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td class="chart-pink fw-bold">Fat</td>
+                                <td>20 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td> - Saturated Fat</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td> - Trans Fat</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td>Cholesterol</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td>Sodium</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td>Fiber</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                            <tr>
+                                <td>Sugar</td>
+                                <td>2 <span class="measurement">g</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add Ingredient</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="{% url 'new_recipe' %}" method="POST" class="container" id="new-recipe-form">
+        
+        <div class="row">
+            <div class="col-12 col-md-6">
+                {% crispy generalForm %}
+                <input type="submit" value="Create recipe" class="btn btn-primary">
+            </div>
+            <div class="col-12 col-md-6">
+                <h2>Ingredients</h2>
+                <a href="" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#new-ingredient-modal">Add Ingredient</a>
+                <h2>Instructions</h2>
+                <div id="instruction-container">
+                    {% crispy instructionForm instructionFormHelper %}
+                </div>
+                <a href="" class="btn btn-secondary">Add Step</a>
+            </div>
+        </div>
+    </form>
 
 {% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'cookbook/js/new_recipe.js' %}"></script>
+{% endblock scripts %}

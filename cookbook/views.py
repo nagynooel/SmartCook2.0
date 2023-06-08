@@ -8,6 +8,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
+from django.forms import formset_factory
+from .forms import (
+    RecipeGeneralForm,
+    RecipeIngredientForm,
+    RecipeInstructionForm,
+    RecipeInstructionFormHelper
+)
 
 # Dashboard
 @login_required
@@ -17,6 +24,11 @@ def index_view(request):
 
 @login_required
 def create_new_recipe_view(request):
-    context = {}
+    context = {
+        "generalForm":RecipeGeneralForm(),
+        "ingredientForm":RecipeIngredientForm(),
+        "instructionForm":formset_factory(RecipeInstructionForm, extra=4),
+        "instructionFormHelper":RecipeInstructionFormHelper(),
+    }
 
     return render(request, "cookbook/new_recipe.html", context)
